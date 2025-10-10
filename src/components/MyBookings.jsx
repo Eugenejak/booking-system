@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../components/AuthProvider";
 
 export default function MyBookings() {
-    const { user } = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
     const [message, setMessage] = useState("");
     const [editBookingId, setEditBookingId] = useState(null);
@@ -14,16 +14,16 @@ export default function MyBookings() {
     }
 
     useEffect(() => {
-        if (!user) return;
+        if (!currentUser) return;
 
         const token = localStorage.getItem("authToken");
-        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/user/${user.id}`, {
+        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/currentUser/${currentUser.id}`, {
             headers: { "Authorization": `Bearer ${token}` }
         })
             .then(res => res.json())
             .then(data => setBookings(data))
             .catch(err => console.error(err));
-    }, [user]);
+    }, [currentUser]);
 
     async function handleDelete(id) {
         const token = localStorage.getItem("authToken");

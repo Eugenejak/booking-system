@@ -29,7 +29,6 @@ export default function AuthPage() {
         try {
             const res = await createUserWithEmailAndPassword(
                 auth,
-                name,
                 email,
                 password
             );
