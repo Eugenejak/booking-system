@@ -15,7 +15,6 @@ export default function AuthPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [authToken, setAuthToken] = useLocalStorage("authToken", "");
 
     const navigate = useNavigate();
     const auth = getAuth();
@@ -25,17 +24,12 @@ export default function AuthPage() {
         if (currentUser) navigate("/profile");
     }, [currentUser, navigate]);
 
-    useEffect(() => {
-        if (authToken) {
-            navigate("/profile");
-        }
-    }, [authToken, navigate]);
-
     const handleSignUp = async (e) => {
         e.preventDefault();
         try {
             const res = await createUserWithEmailAndPassword(
                 auth,
+                name,
                 email,
                 password
             );
