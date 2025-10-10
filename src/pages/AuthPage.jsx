@@ -1,7 +1,9 @@
 import {
+    GoogleAuthProvider,
     createUserWithEmailAndPassword,
     getAuth,
     signInWithEmailAndPassword,
+    signInWithPopup,
 } from "firebase/auth";
 import { useContext, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
@@ -46,13 +48,24 @@ export default function AuthPage() {
             console.error(error);
         }
     };
+
+    const provider = new GoogleAuthProvider();
+    const handleGoogleLogin = async (e) => {
+        e.preventDefault();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const handleClose = () => setModalShow(null);
 
     return (
         <>
             <h2>Sports Booking System</h2>
             <Row>
-                <Col sm={6}>
+                <Col sm={4}>
                     <Button className="rounded-pill" onClick={handleShowSignUp}>
                         Get Started
                     </Button>
@@ -99,11 +112,22 @@ export default function AuthPage() {
                     </Modal.Body>
                 </Modal>
 
-                <Col sm={6}>
+                <Col sm={4}>
                     <Button className="rounded-pill"
                         variant="outline-primary"
                         onClick={handleShowLogin}
                     >Sign In
+                    </Button>
+                </Col>
+
+                <Col sm={4} className="d-grid gap-2">
+                    <Button
+                        className="rounded-pill"
+                        variant="outline-dark"
+                        onClick={handleGoogleLogin}
+                    >
+                        <i className="bi bi-google"></i>
+                        Sign in with Google
                     </Button>
                 </Col>
             </Row>
