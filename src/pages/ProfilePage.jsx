@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Navbar, Container, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import BookingPage from "../components/BookingForm";
-import { AuthContext } from "../context/AuthProvider";
+import { AuthContext } from "../components/AuthProvider";
 import MyBookings from "../components/MyBookings";
 import { getAuth } from "firebase/auth";
 
