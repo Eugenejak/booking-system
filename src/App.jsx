@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AuthPage from './pages/AuthPage'
 import ProfilePage from './pages/ProfilePage';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './components/AuthProvider';
 
 function App() {
   return (
-    <AuthProvider >
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/profile" element={<ProfilePage />} />

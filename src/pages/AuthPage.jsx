@@ -1,12 +1,14 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import {
+    createUserWithEmailAndPassword,
+    getAuth,
+    signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useContext, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import useLocalStorage from 'use-local-storage';
+import { AuthContext } from "../components/AuthProvider";
 
 export default function AuthPage() {
-    const url = "https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev"
-
     const [modalShow, setModalShow] = useState(null);
     const handleShowSignUp = () => setModalShow("SignUp");
     const handleShowLogin = () => setModalShow("Login");
@@ -16,6 +18,12 @@ export default function AuthPage() {
     const [authToken, setAuthToken] = useLocalStorage("authToken", "");
 
     const navigate = useNavigate();
+    const auth = getAuth();
+    const { currentUser } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (currentUser) navigate("/profile");
+    }, [currentUser, navigate]);
 
     useEffect(() => {
         if (authToken) {
@@ -26,8 +34,12 @@ export default function AuthPage() {
     const handleSignUp = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post(`${url}/signup`, { name, email, password });
-            console.log(res.data);
+            const res = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            console.log(res.user);
         } catch (error) {
             console.error(error);
         }
@@ -36,11 +48,7 @@ export default function AuthPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post(`${url}/login`, { email, password });
-            if (res.data && res.data.auth === true && res.data.token) {
-                setAuthToken(res.data.token);
-                console.log("Login was successful, token saved");
-            }
+            await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
             console.error(error);
         }

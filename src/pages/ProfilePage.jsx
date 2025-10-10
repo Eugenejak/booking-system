@@ -1,24 +1,23 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Navbar, Container, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import useLocalStorage from "use-local-storage";
 import BookingPage from "../components/BookingForm";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthProvider";
 import MyBookings from "../components/MyBookings";
+import { getAuth } from "firebase/auth";
 
 export default function ProfilePage() {
-    const [authToken, setAuthToken] = useLocalStorage("authToken", "");
+    const auth = getAuth();
     const navigate = useNavigate();
-    const { user } = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
 
-    useEffect(() => {
-        if (!authToken) {
-            navigate("/login");
-        }
-    }, [authToken, navigate]);
+    // Check if currentUser is logged in
+    if (!currentUser) {
+        navigate("/login"); // Redirect to login if user not logged in
+    }
 
     const handleLogout = () => {
-        setAuthToken("");
+        auth.signOut();
     };
 
     return (
@@ -34,7 +33,7 @@ export default function ProfilePage() {
             </Navbar>
 
             <Container className="mt-3">
-                <h2>Hello {user ? user.name : "Guest"}</h2>
+                <h2>Hello {currentUser ? currentUser.name : "Guest"}</h2>
                 <MyBookings />
                 <BookingPage />
             </Container>
