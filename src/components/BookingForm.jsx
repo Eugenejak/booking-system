@@ -73,16 +73,28 @@ export default function BookingForm({ bookingToEdit }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("authToken");
-        const decoded = jwtDecode(token);
-        const user_id = decoded.user?.id || decoded.id;
+        if (!token || typeof token !== "string") {
+            setMessage("Authentication error: Please log in again.");
+            return;
+        }
+        let decoded;
+        try {
+            decoded = jwtDecode(token);
+        } catch {
+            setMessage("Invalid token. Please log in again.");
+            return;
+        }
+        const user_id = decoded.uid || decoded.sub || decoded.user?.id || decoded.id;
 
         const bookingData = {
             user_id,
+            sport_type: selectedSport,
             court_id: selectedCourt,
             booking_date: date,
             start_time: startTime,
             end_time: endTime,
         };
+        console.log("Booking data:", bookingData);
 
         const isEditing = !!bookingToEdit;
         const url = isEditing

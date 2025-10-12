@@ -34,18 +34,56 @@ export default function AuthPage() {
                 email,
                 password
             );
-            console.log(res.user);
+            const user = res.user;
+            if (user) {
+                const token = await user.getIdToken();
+                localStorage.setItem("authToken", token);
+
+                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: user.uid,
+                        name: name || "New User",
+                        email: user.email,
+                        role: "user",
+                    }),
+                });
+            }
+            console.log("✅ User registered:", user.email);
         } catch (error) {
-            console.error(error);
+            console.error("SignUp Error:", error);
         }
     };
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const res = await signInWithEmailAndPassword(auth, email, password);
+            const user = res.user;
+            if (user) {
+                const token = await user.getIdToken();
+                localStorage.setItem("authToken", token);
+                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: user.uid,
+                        name: user.displayName || name || "Existing User",
+                        email: user.email,
+                        role: "user",
+                    }),
+                });
+            }
+            console.log("✅ User logged in:", user.email);
         } catch (error) {
-            console.error(error);
+            console.error("Login Error:", error);
         }
     };
 
@@ -53,7 +91,12 @@ export default function AuthPage() {
     const handleGoogleLogin = async (e) => {
         e.preventDefault();
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            if (user) {
+                const token = await user.getIdToken();
+                localStorage.setItem("authToken", token);
+            }
         } catch (error) {
             console.error(error);
         }

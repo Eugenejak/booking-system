@@ -17,7 +17,7 @@ export default function MyBookings() {
         if (!currentUser) return;
 
         const token = localStorage.getItem("authToken");
-        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/currentUser/${currentUser.id}`, {
+        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/currentUser/${currentUser.uid}`, {
             headers: { "Authorization": `Bearer ${token}` }
         })
             .then(res => res.json())
