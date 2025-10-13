@@ -7,14 +7,12 @@ import {
     updateProfile
 } from "firebase/auth";
 import { useContext, useEffect, useState } from 'react';
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../components/AuthProvider";
 
 export default function AuthPage() {
-    const [modalShow, setModalShow] = useState(null);
-    const handleShowSignUp = () => setModalShow("SignUp");
-    const handleShowLogin = () => setModalShow("Login");
+    const [isSignUp, setIsSignUp] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -123,79 +121,89 @@ export default function AuthPage() {
         }
     };
 
-    const handleClose = () => setModalShow(null);
-
     return (
-        <>
-            <h2>Sports Booking System</h2>
-            <Row>
-                <Col sm={4}>
-                    <Button className="rounded-pill" onClick={handleShowSignUp}>
-                        Get Started
-                    </Button>
-                </Col>
-                <Modal show={modalShow !== null}
-                    onHide={handleClose}
-                    animation={false}
-                    centered>
-                    <Modal.Body>
-                        <h2 className="mb-4" style={{ fontWeight: "bold" }}>
-                            {modalShow === "SignUp"
-                                ? "Create your account"
-                                : "Log in to your account"}
-                        </h2>
-                        <Form className="d-grid gap-2 px-5"
-                            onSubmit={modalShow === "SignUp" ? handleSignUp : handleLogin}>
-                            {modalShow === "SignUp" && (
-                                <Form.Group className="mb-3" controlId="formName">
+        <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+            <Row className="w-100">
+                <Col md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
+                    <Card className="shadow-sm">
+                        <Card.Body className="p-4">
+                            <div className="text-center mb-4">
+                                <h2 className="fw-bold">Sports Booking System</h2>
+                                <p className="text-muted">
+                                    {isSignUp ? "Create your account" : "Welcome"}
+                                </p>
+                            </div>
+
+                            <Form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+                                {isSignUp && (
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Name</Form.Label>
+                                        <Form.Control
+                                            onChange={(e) => setName(e.target.value)}
+                                            type="text"
+                                            placeholder="Enter your name"
+                                            required
+                                        />
+                                    </Form.Group>
+                                )}
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Email</Form.Label>
                                     <Form.Control
-                                        onChange={(e) => setName(e.target.value)}
-                                        type="name"
-                                        placeholder="Enter name" />
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        required
+                                    />
                                 </Form.Group>
-                            )}
 
-                            <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Control
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    type="email"
-                                    placeholder="Enter email" />
-                            </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Password</Form.Label>
+                                    <Form.Control
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        required
+                                    />
+                                </Form.Group>
 
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Control
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
-                                    placeholder='Password' />
-                            </Form.Group>
+                                <Button className="w-100 mb-3" type="submit" variant="primary">
+                                    {isSignUp ? "Sign Up" : "Log In"}
+                                </Button>
+                            </Form>
 
-                            <Button className="rounded-pill" type="submit">
-                                {modalShow === "SignUp" ? "Sign up" : "Log in"}
+                            <div className="position-relative mb-3">
+                                <hr />
+                                <span className="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted">
+                                    or
+                                </span>
+                            </div>
+
+                            <Button
+                                className="w-100 mb-3"
+                                variant="outline-dark"
+                                onClick={handleGoogleLogin}
+                            >
+                                <i className="bi bi-google me-2"></i>
+                                Continue with Google
                             </Button>
-                        </Form>
-                    </Modal.Body>
-                </Modal>
 
-                <Col sm={4}>
-                    <Button className="rounded-pill"
-                        variant="outline-primary"
-                        onClick={handleShowLogin}
-                    >Sign In
-                    </Button>
-                </Col>
-
-                <Col sm={4} className="d-grid gap-2">
-                    <Button
-                        className="rounded-pill"
-                        variant="outline-dark"
-                        onClick={handleGoogleLogin}
-                    >
-                        <i className="bi bi-google"></i>
-                        Sign in with Google
-                    </Button>
+                            <div className="text-center">
+                                <small>
+                                    {isSignUp ? "Already have an account? " : "Don't have an account? "}
+                                    <Button
+                                        variant="link"
+                                        className="p-0 text-decoration-none"
+                                        onClick={() => setIsSignUp(!isSignUp)}
+                                    >
+                                        {isSignUp ? "Log in" : "Sign up"}
+                                    </Button>
+                                </small>
+                            </div>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
-        </>
+        </Container>
     );
 }
-
