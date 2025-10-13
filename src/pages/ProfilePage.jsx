@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Navbar, Container, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import BookingPage from "../components/BookingForm";
@@ -12,9 +12,11 @@ export default function ProfilePage() {
     const { currentUser } = useContext(AuthContext);
 
     // Check if currentUser is logged in
-    if (!currentUser) {
-        navigate("/login"); // Redirect to login if user not logged in
-    }
+    useEffect(() => {
+        if (!currentUser) {
+            navigate("/login"); // Redirect to login if user not logged in
+        }
+    }, [currentUser, navigate]);
 
     const handleLogout = () => {
         auth.signOut();
@@ -33,7 +35,7 @@ export default function ProfilePage() {
             </Navbar>
 
             <Container className="mt-3">
-                <h2>Hello {currentUser ? currentUser.name : "Guest"}</h2>
+                <h2>Hello {currentUser?.displayName || "Guest"}, </h2>
                 <MyBookings />
                 <BookingPage />
             </Container>

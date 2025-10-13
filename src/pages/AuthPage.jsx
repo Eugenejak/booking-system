@@ -4,6 +4,7 @@ import {
     getAuth,
     signInWithEmailAndPassword,
     signInWithPopup,
+    updateProfile
 } from "firebase/auth";
 import { useContext, useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
@@ -20,7 +21,7 @@ export default function AuthPage() {
 
     const navigate = useNavigate();
     const auth = getAuth();
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, setCurrentUser } = useContext(AuthContext);
 
     useEffect(() => {
         if (currentUser) navigate("/profile");
@@ -35,6 +36,11 @@ export default function AuthPage() {
                 password
             );
             const user = res.user;
+
+            await updateProfile(user, { displayName: name });
+            console.log("After updateProfile:", user.displayName);
+            setCurrentUser({ ...user, displayName: name });
+
             if (user) {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
