@@ -94,19 +94,34 @@ export default function AuthPage() {
     };
 
     const provider = new GoogleAuthProvider();
+
     const handleGoogleLogin = async (e) => {
         e.preventDefault();
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
+
             if (user) {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
+
+                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        id: user.uid,
+                        name: user.displayName || "Google User",
+                        email: user.email,
+                    }),
+                });
             }
         } catch (error) {
-            console.error(error);
+            console.error("Google login error:", error);
         }
-    }
+    };
 
     const handleClose = () => setModalShow(null);
 

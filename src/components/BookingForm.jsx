@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
-export default function BookingForm({ bookingToEdit }) {
+export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
     const sports = ["Badminton", "Futsal"];
     const [selectedSport, setSelectedSport] = useState("");
     const [courts, setCourts] = useState([]);
@@ -120,6 +120,10 @@ export default function BookingForm({ bookingToEdit }) {
                 setDate("");
                 setStartTime("");
                 setEndTime("");
+
+                if (onBookingSuccess) {
+                    onBookingSuccess();
+                }
 
                 setTimeout(() => {
                     setMessage("");

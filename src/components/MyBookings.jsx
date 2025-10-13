@@ -1,9 +1,6 @@
-import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { useState } from "react";
 
-export default function MyBookings() {
-    const { currentUser } = useContext(AuthContext);
-    const [bookings, setBookings] = useState([]);
+export default function MyBookings({ bookings, setBookings }) {
     const [message, setMessage] = useState("");
     const [editBookingId, setEditBookingId] = useState(null);
     const [editData, setEditData] = useState({ booking_date: "", start_time: "", end_time: "" });
@@ -12,18 +9,6 @@ export default function MyBookings() {
     for (let i = 8; i <= 23; i++) {
         hours.push(i);
     }
-
-    useEffect(() => {
-        if (!currentUser) return;
-
-        const token = localStorage.getItem("authToken");
-        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/currentUser/${currentUser.uid}`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-            .then(res => res.json())
-            .then(data => setBookings(data))
-            .catch(err => console.error(err));
-    }, [currentUser]);
 
     async function handleDelete(id) {
         const token = localStorage.getItem("authToken");
