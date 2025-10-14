@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../config";
 
 export default function MyBookings({ bookings, setBookings }) {
     const [message, setMessage] = useState("");
@@ -12,7 +13,7 @@ export default function MyBookings({ bookings, setBookings }) {
 
     async function handleDelete(id) {
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/${id}`, {
+        const res = await fetch(`${API_URL}/bookings/${id}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${token}` },
         });
@@ -40,7 +41,7 @@ export default function MyBookings({ bookings, setBookings }) {
     const handleEditSave = async (b) => {
         const token = localStorage.getItem("authToken");
 
-        const res = await fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/${b.id}`, {
+        const res = await fetch(`${API_URL}/bookings/${b.id}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,

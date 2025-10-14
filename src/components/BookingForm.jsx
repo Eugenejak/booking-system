@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { API_URL } from "../config";
 
 export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
     const sports = ["Badminton", "Futsal"];
@@ -60,7 +61,7 @@ export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
     useEffect(() => {
         if (!selectedSport) return;
 
-        fetch(`https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/courts?sport_type=${selectedSport.toLowerCase()}`)
+        fetch(`${API_URL}/courts?sport_type=${selectedSport.toLowerCase()}`)
             .then(res => res.json())
             .then(data => {
                 console.log("Fetched courts:", data);
@@ -98,8 +99,8 @@ export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
 
         const isEditing = !!bookingToEdit;
         const url = isEditing
-            ? `https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/${bookingToEdit.id}`
-            : `https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings`;
+            ? `${API_URL}/bookings/${bookingToEdit.id}`
+            : `${API_URL}/bookings`;
         const method = isEditing ? "PUT" : "POST";
 
 

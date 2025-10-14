@@ -5,6 +5,7 @@ import BookingPage from "../components/BookingForm";
 import { AuthContext } from "../components/AuthProvider";
 import MyBookings from "../components/MyBookings";
 import { getAuth } from "firebase/auth";
+import { API_URL } from "../config";
 
 export default function ProfilePage() {
     const auth = getAuth();
@@ -23,8 +24,6 @@ export default function ProfilePage() {
         if (!currentUser) return;
         fetchBookings();
     }, [currentUser]);
-
-    const API_URL = import.meta.env.VITE_API_URL;
 
     const fetchBookings = async () => {
         const token = localStorage.getItem("authToken");

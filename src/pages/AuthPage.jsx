@@ -10,6 +10,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../components/AuthProvider";
+import { API_URL } from "../config";
 
 export default function AuthPage() {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -43,7 +44,7 @@ export default function AuthPage() {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
 
-                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -71,7 +72,7 @@ export default function AuthPage() {
             if (user) {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
-                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -103,7 +104,7 @@ export default function AuthPage() {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
 
-                await fetch("https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/users", {
+                await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
