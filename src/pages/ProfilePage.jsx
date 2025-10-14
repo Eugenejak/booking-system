@@ -24,11 +24,13 @@ export default function ProfilePage() {
         fetchBookings();
     }, [currentUser]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const fetchBookings = async () => {
         const token = localStorage.getItem("authToken");
         try {
             const res = await fetch(
-                `https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/bookings/currentUser/${currentUser.uid}`,
+                `${API_URL}/bookings/currentUser/${currentUser.uid}`,
                 { headers: { "Authorization": `Bearer ${token}` } }
             );
             const data = await res.json();
