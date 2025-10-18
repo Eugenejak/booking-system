@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { API_URL } from "../config";
+import { createTimeSlots } from "../utilities/timeSlots";
 
 export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
     const sports = ["Badminton", "Futsal"];
@@ -11,41 +12,8 @@ export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const [message, setMessage] = useState("");
-
-    const startTimeSlots = [
-        "08:00",
-        "09:00",
-        "10:00",
-        "11:00",
-        "12:00",
-        "13:00",
-        "14:00",
-        "15:00",
-        "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-    ];
-    const endTimeSlots = [
-        "09:00",
-        "10:00",
-        "11:00",
-        "12:00",
-        "13:00",
-        "14:00",
-        "15:00",
-        "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00",
-    ];
+    const startTimeSlots = createTimeSlots(8, 23, true);
+    const endTimeSlots = createTimeSlots(8, 23);
 
     useEffect(() => {
         if (bookingToEdit) {
@@ -136,8 +104,6 @@ export default function BookingForm({ bookingToEdit, onBookingSuccess }) {
             console.error(error)
         }
     };
-
-
 
     return (
         <form onSubmit={handleSubmit} className="p-3 border rounded shadow-sm mt-4">

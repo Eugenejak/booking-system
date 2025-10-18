@@ -6,13 +6,18 @@ import { AuthContext } from "../components/AuthProvider";
 import MyBookings from "../components/MyBookings";
 import { getAuth } from "firebase/auth";
 import { API_URL } from "../config";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { createTimeSlots } from "../utilities/timeSlots";
+import { db } from "../firebase";
+import { addDoc, collection, onSnapshot, serverTimestamp, query, where } from "firebase/firestore";
 
 export default function ProfilePage() {
     const auth = getAuth();
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
+
+    const startTimeSlots = createTimeSlots(8, 23, true);
+    const endTimeSlots = createTimeSlots(8, 23);
 
     const [myMatch, setMyMatch] = useState([]);
     const [sport, setSport] = useState("");
@@ -58,7 +63,7 @@ export default function ProfilePage() {
         if (!currentUser) return;
         const userQuery = query(collection(db, "matchRequests"), where("created by", "==", "currentUser.uid"));
         const unsubscribe = onSnapshot(userQuery, (snap) => {
-            setMyMatch(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setMyMatch(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         });
         return unsubscribe;
     }, [currentUser]);
@@ -117,16 +122,42 @@ export default function ProfilePage() {
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                     />
-                    <input
-                        type="datetime-local"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                    />
-                    <input
-                        type="datetime-local"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                    />
+
+                    <div className="mb-3">
+                        <label>Start Time</label>
+                        <select
+                            className="form-control"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            required
+                        >
+                            <option value="">Select start time</option>
+                            {startTimeSlots.map((time) => (
+                                <option key={time} value={time}>
+                                    {time}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="mb-3">
+                        <label>End Time</label>
+                        <select
+                            className="form-control"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                        >
+                            <option value="">Select end time</option>
+                            {endTimeSlots
+                                .filter((time) => !startTime || time > startTime)
+                                .map((time) => (
+                                    <option key={time} value={time}>
+                                        {time}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+
                     <Button type="submit" className="mt-2">Create Match</Button>
                 </form>
 
