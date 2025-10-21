@@ -1,13 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import { Navbar, Container, Button, Row, Col, Card, Tabs, Tab } from "react-bootstrap";
+import { Navbar, Container, Button, Tabs, Tab } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import BookingForm from "../components/BookingForm";
 import { AuthContext } from "../components/AuthProvider";
 import MyBookings from "../components/MyBookings";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import { API_URL } from "../config";
 import CreateMatch from "../components/CreateMatch";
 import MatchRequestsList from "../components/MatchRequestsList";
+import MyMatches from "../components/MyMatches";
 
 export default function ProfilePage() {
     const auth = getAuth();
@@ -45,8 +46,19 @@ export default function ProfilePage() {
         fetchBookings();
     };
 
-    const handleLogout = () => {
-        auth.signOut();
+    const handleLogout = async () => {
+        try {
+            console.log("Logging out...");
+
+            await signOut(auth);
+
+            console.log("✅ User signed out successfully");
+
+            navigate("/login");
+        } catch (error) {
+            console.error("❌ Error during logout:", error);
+            alert("Failed to log out. Please try again.");
+        }
     };
 
     return (
@@ -54,7 +66,14 @@ export default function ProfilePage() {
             <Navbar bg="light">
                 <Container>
                     <Navbar.Collapse className="justify-content-end">
-                        <Button variant="primary" onClick={handleLogout}>
+                        <div className="container mt-2">
+                            <h5>Profile</h5>
+                            <p>Signed in as {auth.currentUser?.email}</p>
+                        </div>
+                        <Button
+                            variant="primary"
+                            className="btn btn-danger mt-3"
+                            onClick={handleLogout}>
                             Logout
                         </Button>
                     </Navbar.Collapse>
@@ -74,8 +93,12 @@ export default function ProfilePage() {
                         <CreateMatch currentUser={currentUser} />
                     </Tab>
 
-                    <Tab eventKey="matchrequests" title="Match Requests">
+                    <Tab eventKey="open" title="Open Matches">
                         <MatchRequestsList currentUser={currentUser} />
+                    </Tab>
+
+                    <Tab eventKey="myMatches" title="My Matches">
+                        <MyMatches currentUser={currentUser} />
                     </Tab>
                 </Tabs>
             </Container>
