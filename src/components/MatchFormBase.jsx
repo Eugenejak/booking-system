@@ -1,4 +1,3 @@
-// src/components/shared/MatchFormBase.jsx
 import { useState } from "react";
 import { createTimeSlots } from "../utilities/timeSlots";
 
@@ -10,27 +9,40 @@ export default function MatchFormBase({
     onSubmit,
     submitLabel,
     showNote = false,
+    onSportSelect,
+    initialData = {},
+    resetAfterSubmit = false,
 }) {
-    const [selectedSport, setSelectedSport] = useState("");
-    const [selectedCourt, setSelectedCourt] = useState("");
-    const [date, setDate] = useState("");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-    const [note, setNote] = useState("");
+    const [selectedSport, setSelectedSport] = useState(initialData.sport || "");
+    const [selectedCourt, setSelectedCourt] = useState(initialData.court_id || "");
+    const [date, setDate] = useState(initialData.date || "");
+    const [startTime, setStartTime] = useState(initialData.startTime || "");
+    const [endTime, setEndTime] = useState(initialData.endTime || "");
+    const [note, setNote] = useState(initialData.note || "");
 
     const startTimeSlots = createTimeSlots(8, 23, true);
     const endTimeSlots = createTimeSlots(8, 23);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         onSubmit({
             sport: selectedSport,
             court_id: selectedCourt,
-            date,
-            startTime,
-            endTime,
+            booking_date: date,
+            start_time: startTime,
+            end_time: endTime,
             note,
         });
+
+        if (resetAfterSubmit) {
+            setSelectedSport("");
+            setSelectedCourt("");
+            setDate("");
+            setStartTime("");
+            setEndTime("");
+            setNote("");
+        }
     };
 
     return (
@@ -42,9 +54,16 @@ export default function MatchFormBase({
                 <select
                     className="form-control"
                     value={selectedSport}
-                    onChange={(e) => setSelectedSport(e.target.value)}
+                    onChange={(e) => {
+                        const sport = e.target.value;
+                        setSelectedSport(sport);
+                        if (typeof onSportSelect === "function")
+                            onSportSelect(sport);
+                    }
+                    }
                     required
                 >
+
                     <option value="">Select a sport</option>
                     {sports.map((sport) => (
                         <option key={sport} value={sport}>
@@ -71,26 +90,28 @@ export default function MatchFormBase({
                         ))}
                     </select>
                 </div>
-            )}
+            )
+            }
 
             <div className="mb-3">
-                <label>Date</label>
+                <label>Date {!showCourt && "(Optional)"}</label>
                 <input
                     type="date"
                     className="form-control"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    required
+                    onFocus={(e) => e.target.showPicker && e.target.showPicker()}
+                    required={showCourt}
                 />
             </div>
 
             <div className="mb-3">
-                <label>Start Time</label>
+                <label>Start Time {!showCourt && "(Optional)"}</label>
                 <select
                     className="form-control"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    required
+                    required={showCourt}
                 >
                     <option value="">Select start time</option>
                     {startTimeSlots.map((time) => (
@@ -102,11 +123,12 @@ export default function MatchFormBase({
             </div>
 
             <div className="mb-3">
-                <label>End Time</label>
+                <label>End Time {!showCourt && "(Optional)"}</label>
                 <select
                     className="form-control"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    required={showCourt}
                 >
                     <option value="">Select end time</option>
                     {endTimeSlots
@@ -129,11 +151,12 @@ export default function MatchFormBase({
                         onChange={(e) => setNote(e.target.value)}
                     />
                 </div>
-            )}
+            )
+            }
 
             <button type="submit" className="btn btn-primary w-100">
                 {submitLabel}
             </button>
-        </form>
+        </form >
     );
 }
