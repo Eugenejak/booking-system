@@ -7,6 +7,7 @@ import MyBookings from "../components/MyBookings";
 import { getAuth } from "firebase/auth";
 import { API_URL } from "../config";
 import CreateMatch from "../components/CreateMatch";
+import MatchRequestsList from "../components/MatchRequestsList";
 
 export default function ProfilePage() {
     const auth = getAuth();
@@ -71,6 +72,10 @@ export default function ProfilePage() {
 
                     <Tab eventKey="matchmaking" title="Create a Match">
                         <CreateMatch currentUser={currentUser} />
+                    </Tab>
+
+                    <Tab eventKey="matchrequests" title="Match Requests">
+                        <MatchRequestsList currentUser={currentUser} />
                     </Tab>
                 </Tabs>
             </Container>
