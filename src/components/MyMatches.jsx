@@ -213,12 +213,14 @@ export default function MyMatches({ currentUser }) {
                                         >
                                             💬 Chat
                                         </button>
-                                        <button
-                                            className="btn btn-outline-danger w-50"
-                                            onClick={() => handleCancelMatch(match.id)}
-                                        >
-                                            ❌ Cancel
-                                        </button>
+                                        {(currentUser.uid === match.creator_id || currentUser.uid === match.accepter_id) && (
+                                            <button
+                                                className="btn btn-danger btn-sm"
+                                                onClick={() => handleCancelMatch(match.id)}>
+                                                Cancel Match
+                                            </button>
+                                        )}
+
                                     </div>
 
                                     <p className="card-text">

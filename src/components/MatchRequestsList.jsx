@@ -81,6 +81,7 @@ export default function MatchRequestsList({ currentUser }) {
         }
 
         try {
+            console.log("Creating booking...");
             // Create a booking document
             const bookingRef = await addDoc(collection(db, "bookings"), {
                 creator_id: request.created_by,
@@ -90,6 +91,7 @@ export default function MatchRequestsList({ currentUser }) {
                 status: "confirmed",
                 created_at: serverTimestamp(),
             });
+            console.log("Updating booking...");
             const sortedIds = [request.created_by, currentUser.uid].sort();
             let chatChannelId = `${sortedIds[0]}_${sortedIds[1]}`;
 
@@ -103,10 +105,16 @@ export default function MatchRequestsList({ currentUser }) {
             }
             // Update the match request to "accepted"
             await updateDoc(bookingRef, { chat_channel_id: chatChannelId });
+            console.log("Updating matchRequest...");
 
-            await updateDoc(doc(db, "matchRequests", request.id), {
+            const matchRequestRef = doc(db, "matchRequests", request.id);
+            console.log("Updating matchRequest at path:", matchRequestRef.path);
+            console.log("Current user UID:", currentUser.uid);
+
+            await updateDoc(matchRequestRef, {
                 status: "accepted",
-                chat_channel_id: chatChannelId
+                chat_channel_id: chatChannelId,
+                accepted_by: currentUser.uid,
             });
 
             setMessage("✅ Match accepted!");
