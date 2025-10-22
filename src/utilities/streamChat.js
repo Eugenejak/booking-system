@@ -33,7 +33,7 @@ export const connectStreamChat = async (currentUser) => {
 
 export const disconnectStreamChat = async () => {
     if (chatClient) {
-        await chatClient.disconnectStreamChat();
+        await chatClient.disconnectUser();
         chatClient = null;
         console.log("✅ Stream Chat disconnected");
     }
