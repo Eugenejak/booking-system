@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where, or, doc, getDoc } from "firebase/firestore";
+import { and, collection, doc, getDoc, getDocs, or, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
+import { connectStreamChat } from "../utilities/streamChat";
 
 export default function MyMatches({ currentUser }) {
     const [matches, setMatches] = useState([]);
@@ -15,19 +16,22 @@ export default function MyMatches({ currentUser }) {
             setError("");
 
             try {
-                // 1️⃣ Get all confirmed matches where the user is either the creator or accepter
+                // Get all confirmed matches where the user is creator or accepter
                 const q = query(
                     collection(db, "bookings"),
-                    or(
-                        where("creator_id", "==", currentUser.uid),
-                        where("accepter_id", "==", currentUser.uid)
+                    and(
+                        or(
+                            where("creator_id", "==", currentUser.uid),
+                            where("accepter_id", "==", currentUser.uid)
+                        ),
+                        where("status", "==", "confirmed")
                     )
                 );
 
                 const snapshot = await getDocs(q);
                 const matchesList = [];
 
-                // 2️⃣ For each booking, also get its linked matchRequest data
+                // Get its linked matchRequest data for each booking
                 for (const matchDoc of snapshot.docs) {
                     const matchData = matchDoc.data();
 
@@ -51,7 +55,7 @@ export default function MyMatches({ currentUser }) {
                     });
                 }
 
-                // 3️⃣ Sort newest first
+                // Sort newest first
                 matchesList.sort((a, b) => {
                     if (!a.created_at || !b.created_at) return 0;
                     return b.created_at.seconds - a.created_at.seconds;
@@ -69,7 +73,7 @@ export default function MyMatches({ currentUser }) {
         fetchMyMatches();
     }, [currentUser]);
 
-    // Loading and error handling
+    // Loading
     if (loading) {
         return (
             <div className="text-center mt-4">
@@ -92,7 +96,44 @@ export default function MyMatches({ currentUser }) {
         );
     }
 
-    // UI Rendering
+    const handleCancelMatch = async (matchId) => {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this match?");
+        if (!confirmCancel) return;
+
+        try {
+            const bookingRef = doc(db, "bookings", matchId);
+            await updateDoc(bookingRef, {
+                status: "cancelled",
+            });
+
+            alert("❌ Match cancelled successfully!");
+
+            setMatches((prev) => prev.filter((m) => m.id !== matchId));
+        } catch (error) {
+            console.error("Error cancelling match:", error);
+            alert("Failed to cancel match. Please try again");
+        }
+    };
+
+    const handleOpenChat = async (match) => {
+        try {
+            if (!match.chat_channel_id) {
+                console.error("No chat_channel_id found for this match");
+                return;
+            }
+            const chatClient = await connectStreamChat(currentUser);
+            if (chatClient) {
+                const channel = chatClient.channel("messaging", match.chat_channel_id, {
+                    members: [currentUser.uid, match.creator_id, match.accepter_id].filter(Boolean),
+                });
+                await channel.watch();
+                console.log("✅ Chat ready:", channel.id);
+            }
+        } catch (error) {
+            console.error("Error opening chat", error);
+        }
+    };
+
     return (
         <div className="container mt-4">
             <h3>My Matches</h3>
@@ -111,7 +152,6 @@ export default function MyMatches({ currentUser }) {
                                         {match.matchRequest?.sport || match.sport_type}
                                     </h5>
 
-                                    {/* Match Request Details */}
                                     {match.matchRequest && (
                                         <>
                                             <p className="card-text">
@@ -131,10 +171,24 @@ export default function MyMatches({ currentUser }) {
                                         </>
                                     )}
 
-                                    {/* Basic Info */}
                                     <p className="card-text">
                                         <strong>Status:</strong> {match.status}
                                     </p>
+
+                                    <div className="d-flex justigy-content-between mt-3">
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => handleOpenChat(match)}
+                                        >
+                                            💬 Chat
+                                        </button>
+                                        <button
+                                            className="btn btn-outline-danger w-50"
+                                            onClick={() => handleCancelMatch(match.id)}
+                                        >
+                                            ❌ Cancel
+                                        </button>
+                                    </div>
 
                                     <p className="card-text">
                                         <strong>Creator:</strong>{" "}

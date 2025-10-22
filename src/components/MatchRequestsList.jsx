@@ -81,22 +81,23 @@ export default function MatchRequestsList({ currentUser }) {
         }
 
         try {
-            const chatChannelId = `${request.created_by}_${currentUser.uid}_${Date.now()}`;
-
             // Create a booking document
-            await addDoc(collection(db, "bookings"), {
+            const bookingRef = await addDoc(collection(db, "bookings"), {
                 creator_id: request.created_by,
                 accepter_id: currentUser.uid,
                 match_request_id: request.id,
                 sport_type: request.sport,
-                chat_channel_id: chatChannelId,
                 status: "confirmed",
                 created_at: serverTimestamp(),
             });
+            const chatChannelId = `match_${bookingRef.id.slice(0, 10)}`;
 
             // Update the match request to "accepted"
+            await updateDoc(bookingRef, { chat_channel_id: chatChannelId });
+
             await updateDoc(doc(db, "matchRequests", request.id), {
-                status: "accepted"
+                status: "accepted",
+                chat_channel_id: chatChannelId
             });
 
             setMessage("✅ Match accepted!");

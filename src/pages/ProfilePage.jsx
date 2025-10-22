@@ -9,6 +9,7 @@ import { API_URL } from "../config";
 import CreateMatch from "../components/CreateMatch";
 import MatchRequestsList from "../components/MatchRequestsList";
 import MyMatches from "../components/MyMatches";
+import { disconnectStreamChat } from "../utilities/streamChat";
 
 export default function ProfilePage() {
     const auth = getAuth();
@@ -47,6 +48,7 @@ export default function ProfilePage() {
     };
 
     const handleLogout = async () => {
+        await disconnectStreamChat();
         try {
             console.log("Logging out...");
 
