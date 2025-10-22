@@ -90,8 +90,17 @@ export default function MatchRequestsList({ currentUser }) {
                 status: "confirmed",
                 created_at: serverTimestamp(),
             });
-            const chatChannelId = `match_${bookingRef.id.slice(0, 10)}`;
+            const sortedIds = [request.created_by, currentUser.uid].sort();
+            let chatChannelId = `${sortedIds[0]}_${sortedIds[1]}`;
 
+            // Verify it's under 64 characters
+            if (chatChannelId.length > 64) {
+                console.error("Channel ID too long:", chatChannelId.length);
+                // truncate if needed
+                const id1 = sortedIds[0].substring(0, 30);
+                const id2 = sortedIds[1].substring(0, 30);
+                chatChannelId = `${id1}_${id2}`;
+            }
             // Update the match request to "accepted"
             await updateDoc(bookingRef, { chat_channel_id: chatChannelId });
 

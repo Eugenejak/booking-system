@@ -115,16 +115,47 @@ export default function MyMatches({ currentUser }) {
         }
     };
 
+    const createValidChannelId = (creatorId, accepterId) => {
+        const sortedIds = [creatorId, accepterId].sort();
+        let channelId = `${sortedIds[0]}_${sortedIds[1]}`;
+
+        if (channelId.length > 64) {
+            // Truncate Firebase UIDs to fit
+            const id1 = sortedIds[0].substring(0, 30);
+            const id2 = sortedIds[1].substring(0, 30);
+            channelId = `${id1}_${id2}`;
+        }
+
+        return channelId;
+    };
+
     const handleOpenChat = async (match) => {
         try {
-            if (!match.chat_channel_id) {
-                console.error("No chat_channel_id found for this match");
-                return;
+            console.log("🔍 Match data:", match);
+            console.log("🔍 Channel ID:", match.chat_channel_id);
+            console.log("🔍 Channel ID length:", match.chat_channel_id?.length);
+
+            let channelId = match.chat_channel_id;
+
+            // Fallback: generate valid ID if stored one is invalid
+            if (!channelId || channelId.length > 64) {
+                console.warn("❌ Invalid channel ID, generating new one");
+                channelId = createValidChannelId(match.creator_id, match.accepter_id);
+                console.log("✅ New channel ID:", channelId, "Length:", channelId.length);
             }
+
             const chatClient = await connectStreamChat(currentUser);
             if (chatClient) {
-                const channel = chatClient.channel("messaging", match.chat_channel_id, {
-                    members: [currentUser.uid, match.creator_id, match.accepter_id].filter(Boolean),
+                const uniqueMembers = [...new Set([
+                    currentUser.uid,
+                    match.creator_id,
+                    match.accepter_id
+                ].filter(Boolean))];
+
+                console.log("👥 Members:", uniqueMembers);
+
+                const channel = chatClient.channel("messaging", channelId, {
+                    members: uniqueMembers,
                 });
                 await channel.watch();
                 console.log("✅ Chat ready:", channel.id);
