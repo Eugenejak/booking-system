@@ -7,7 +7,7 @@ export const connectStreamChat = async (currentUser) => {
         if (!chatClient) {
             // get token from backend
             const response = await fetch(
-                `https://36da2f3f-0646-437a-b0b3-41d43b7682db-00-2bbdx267zl8kv.pike.replit.dev/stream-token?userId=${currentUser.uid}`
+                `https://vercel-bookingsystem-api.vercel.app/stream-token?userId=${currentUser.uid}`
             );
             const data = await response.json();
 
