@@ -9,6 +9,7 @@ export default function MyMatches({ currentUser }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [activeChat, setActiveChat] = useState({ client: null, channel: null });
+    const [showChat, setShowChat] = useState(false);
 
     useEffect(() => {
         if (!currentUser) return;
@@ -157,6 +158,7 @@ export default function MyMatches({ currentUser }) {
                 console.log("✅ Chat ready:", channel.id);
 
                 setActiveChat({ client: chatClient, channel });
+                setShowChat(true);
             }
         } catch (error) {
             console.error("Error opening chat", error);
@@ -206,7 +208,7 @@ export default function MyMatches({ currentUser }) {
 
                                     <div className="d-flex gap-2 mt-3">
                                         <button
-                                            className="btn btn-primary flex-fill"
+                                            className="btn btn-outline-primary btn-sm ms-2"
                                             onClick={() => handleOpenChat(match)}
                                         >
                                             💬 Chat
@@ -228,6 +230,8 @@ export default function MyMatches({ currentUser }) {
                                             <MatchChat
                                                 chatClient={activeChat.client}
                                                 chatChannel={activeChat.channel}
+                                                show={showChat}
+                                                onClose={() => setShowChat(false)}
                                             />
                                         </div>
                                     )}

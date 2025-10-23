@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Channel, MessageList, MessageInput, Thread, Window, Chat } from "stream-chat-react";
+import { Channel, Chat, MessageList, MessageInput, Thread, Window } from "stream-chat-react";
+import { Button, Modal } from "react-bootstrap";
 import "stream-chat-react/dist/css/v2/index.css";
 
-export default function MatchChat({ chatClient, chatChannel }) {
+export default function MatchChat({ chatClient, chatChannel, show, onClose }) {
     const [channel, setChannel] = useState(null);
 
     useEffect(() => {
@@ -15,16 +16,26 @@ export default function MatchChat({ chatClient, chatChannel }) {
         return null;
 
     return (
-        <div className="chat-container mt-3 border rounded p-3 bg-light">
-            <Chat client={chatClient} theme="messageing light">
-                <Channel channel={chatChannel}>
-                    <Window>
-                        <MessageList />
-                        <MessageInput focus />
-                    </Window>
-                    <Thread />
-                </Channel>
-            </Chat>
-        </div>
+        <Modal show={show} onHide={onClose} centered size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>💬 Match Chat</Modal.Title>
+            </Modal.Header>
+            <Modal.Body style={{ height: "500px" }}>
+                <Chat client={chatClient} theme="messaging light">
+                    <Channel channel={chatChannel}>
+                        <Window>
+                            <MessageList />
+                            <MessageInput focus />
+                        </Window>
+                        <Thread />
+                    </Channel>
+                </Chat>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }
