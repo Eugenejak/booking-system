@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { and, collection, doc, getDoc, getDocs, or, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { connectStreamChat } from "../utilities/streamChat";
+import MatchChat from "./MatchChat";
 
 export default function MyMatches({ currentUser }) {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [activeChat, setActiveChat] = useState({ client: null, channel: null });
 
     useEffect(() => {
         if (!currentUser) return;
@@ -131,17 +133,11 @@ export default function MyMatches({ currentUser }) {
 
     const handleOpenChat = async (match) => {
         try {
-            console.log("🔍 Match data:", match);
-            console.log("🔍 Channel ID:", match.chat_channel_id);
-            console.log("🔍 Channel ID length:", match.chat_channel_id?.length);
-
             let channelId = match.chat_channel_id;
 
             // Fallback: generate valid ID if stored one is invalid
             if (!channelId || channelId.length > 64) {
-                console.warn("❌ Invalid channel ID, generating new one");
                 channelId = createValidChannelId(match.creator_id, match.accepter_id);
-                console.log("✅ New channel ID:", channelId, "Length:", channelId.length);
             }
 
             const chatClient = await connectStreamChat(currentUser);
@@ -159,6 +155,8 @@ export default function MyMatches({ currentUser }) {
                 });
                 await channel.watch();
                 console.log("✅ Chat ready:", channel.id);
+
+                setActiveChat({ client: chatClient, channel });
             }
         } catch (error) {
             console.error("Error opening chat", error);
@@ -206,35 +204,45 @@ export default function MyMatches({ currentUser }) {
                                         <strong>Status:</strong> {match.status}
                                     </p>
 
-                                    <div className="d-flex justigy-content-between mt-3">
+                                    <div className="d-flex gap-2 mt-3">
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary flex-fill"
                                             onClick={() => handleOpenChat(match)}
                                         >
                                             💬 Chat
                                         </button>
-                                        {(currentUser.uid === match.creator_id || currentUser.uid === match.accepter_id) && (
-                                            <button
-                                                className="btn btn-danger btn-sm"
-                                                onClick={() => handleCancelMatch(match.id)}>
-                                                Cancel Match
-                                            </button>
-                                        )}
 
+                                        {(currentUser.uid === match.creator_id ||
+                                            currentUser.uid === match.accepter_id) && (
+                                                <button
+                                                    className="btn btn-danger flex-fill"
+                                                    onClick={() => handleCancelMatch(match.id)}
+                                                >
+                                                    ❌ Cancel Match
+                                                </button>
+                                            )}
                                     </div>
 
+                                    {activeChat.channel?.id === match.chat_channel_id && (
+                                        <div className="mt-3">
+                                            <MatchChat
+                                                chatClient={activeChat.client}
+                                                chatChannel={activeChat.channel}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <hr />
                                     <p className="card-text">
                                         <strong>Creator:</strong>{" "}
                                         {match.creator_id === currentUser.uid ? "You" : match.creator_id}
                                     </p>
-
                                     <p className="card-text">
                                         <strong>Opponent:</strong>{" "}
                                         {match.accepter_id === currentUser.uid
                                             ? match.creator_id
                                             : match.accepter_id}
                                     </p>
-
                                     <p className="card-text">
                                         <small className="text-muted">
                                             Created on{" "}
@@ -250,5 +258,5 @@ export default function MyMatches({ currentUser }) {
                 </div>
             )}
         </div>
-    );
+    )
 }
