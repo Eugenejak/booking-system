@@ -16,6 +16,7 @@ export default function ProfilePage() {
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
+    const [activeTab, setActiveTab] = useState(localStorage.getItem("activeTab") || "bookings");
 
     // Check if currentUser is logged in
     useEffect(() => {
@@ -56,12 +57,23 @@ export default function ProfilePage() {
 
             console.log("✅ User signed out successfully");
 
+            localStorage.removeItem("activeTab");
             navigate("/login");
         } catch (error) {
             console.error("❌ Error during logout:", error);
             alert("Failed to log out. Please try again.");
         }
     };
+
+    const handleSelect = (key) => {
+        setActiveTab(key);
+        localStorage.setItem("activeTab", key);
+    };
+
+    useEffect(() => {
+        const savedTab = localStorage.getItem("activeTab");
+        if (savedTab) setActiveTab(savedTab);
+    }, []);
 
     return (
         <div
@@ -90,7 +102,7 @@ export default function ProfilePage() {
                             cursor: "pointer",
                         }}
                     >
-                        Sportify<span className="text-light">Book</span>
+                        Sportly
                     </Navbar.Brand>
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -130,7 +142,9 @@ export default function ProfilePage() {
                     }}
                 >
                     <Tabs
-                        defaultActiveKey="bookings"
+                        id="profile-tabs"
+                        activeKey={activeTab}
+                        onSelect={handleSelect}
                         className="mt-3 justify-content-center"
                         fill
                         variant="pills"

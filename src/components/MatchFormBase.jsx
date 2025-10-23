@@ -102,6 +102,7 @@ export default function MatchFormBase({
                     onChange={(e) => setDate(e.target.value)}
                     onFocus={(e) => e.target.showPicker && e.target.showPicker()}
                     required={showCourt}
+                    min={new Date().toISOString().split("T")[0]}
                 />
             </div>
 

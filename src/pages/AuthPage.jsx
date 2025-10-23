@@ -151,7 +151,7 @@ export default function AuthPage() {
                                     <h2 className="fw-bold text-uppercase"
                                         style={{ color: "#a8ff60", fontSize: "1.8rem" }}
                                     >
-                                        Sportify<span className="text-light">Book</span>
+                                        Sportly
                                     </h2>
                                     <p className="text-secondary mb-8"
                                         style={{ fontSize: "0.95rem" }}
