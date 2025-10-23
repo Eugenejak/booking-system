@@ -22,6 +22,7 @@ export default function CreateMatch({ currentUser }) {
 
         const matchData = {
             created_by: currentUser.uid,
+            creator_name: currentUser.displayName || "Anonymous",
             sport: sport,
             note: note || "",
             date: booking_date || null,

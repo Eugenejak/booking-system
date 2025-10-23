@@ -12,8 +12,7 @@ export default function MatchChat({ chatClient, chatChannel, show, onClose }) {
         }
     }, [chatClient, chatChannel]);
 
-    if (!channel)
-        return null;
+    if (!channel) return null;
 
     return (
         <Modal show={show} onHide={onClose} centered size="lg">

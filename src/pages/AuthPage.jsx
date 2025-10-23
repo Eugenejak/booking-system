@@ -123,88 +123,124 @@ export default function AuthPage() {
     };
 
     return (
-        <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
-            <Row className="w-100">
-                <Col md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
-                    <Card className="shadow-sm">
-                        <Card.Body className="p-4">
-                            <div className="text-center mb-4">
-                                <h2 className="fw-bold">Sports Booking System</h2>
-                                <p className="text-muted">
-                                    {isSignUp ? "Create your account" : "Welcome"}
-                                </p>
-                            </div>
+        <div
+            style={{
+                minHeight: "100vh",
+                background: "linear-gradient(135deg, #0a1930 0%, #142850 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "20px",
+            }}
+        >
 
-                            <Form onSubmit={isSignUp ? handleSignUp : handleLogin}>
-                                {isSignUp && (
+            <Container fluid className="px-3 px-sm-5">
+                <Row className="justify-content-center">
+                    <Col xs={12} sm={18} md={8} lg={5} xl={4}>
+                        <Card
+                            className="shadow-lg border-0"
+                            style={{
+                                borderRadius: "1rem",
+                                background: "rgba(255, 255, 255, 0.05)",
+                                backdropFilter: "blur(10px)",
+                                color: "#fff",
+                            }}
+                        >
+                            <Card.Body className="p-4 p-sm-5">
+                                <div className="text-center mb-4">
+                                    <h2 className="fw-bold text-uppercase"
+                                        style={{ color: "#a8ff60", fontSize: "1.8rem" }}
+                                    >
+                                        Sportify<span className="text-light">Book</span>
+                                    </h2>
+                                    <p className="text-secondary mb-8"
+                                        style={{ fontSize: "0.95rem" }}
+                                    >
+                                        {isSignUp ? "Create your account" : "Welcome"}
+                                    </p>
+                                </div>
+
+                                <Form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+                                    {isSignUp && (
+                                        <Form.Group className="mb-3">
+                                            <Form.Label className="text-light">Name</Form.Label>
+                                            <Form.Control
+                                                onChange={(e) => setName(e.target.value)}
+                                                type="text"
+                                                placeholder="Enter your name"
+                                                required
+                                            />
+                                        </Form.Group>
+                                    )}
+
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Name</Form.Label>
+                                        <Form.Label className="text-light">Email</Form.Label>
                                         <Form.Control
-                                            onChange={(e) => setName(e.target.value)}
-                                            type="text"
-                                            placeholder="Enter your name"
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            type="email"
+                                            placeholder="Enter your email"
                                             required
                                         />
                                     </Form.Group>
-                                )}
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        required
-                                    />
-                                </Form.Group>
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="text-light">Password</Form.Label>
+                                        <Form.Control
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            type="password"
+                                            placeholder="Enter your password"
+                                            required
+                                        />
+                                    </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        required
-                                    />
-                                </Form.Group>
-
-                                <Button className="w-100 mb-3" type="submit" variant="primary">
-                                    {isSignUp ? "Sign Up" : "Log In"}
-                                </Button>
-                            </Form>
-
-                            <div className="position-relative mb-3">
-                                <hr />
-                                <span className="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted">
-                                    or
-                                </span>
-                            </div>
-
-                            <Button
-                                className="w-100 mb-3"
-                                variant="outline-dark"
-                                onClick={handleGoogleLogin}
-                            >
-                                <i className="bi bi-google me-2"></i>
-                                Continue with Google
-                            </Button>
-
-                            <div className="text-center">
-                                <small>
-                                    {isSignUp ? "Already have an account? " : "Don't have an account? "}
                                     <Button
-                                        variant="link"
-                                        className="p-0 text-decoration-none"
-                                        onClick={() => setIsSignUp(!isSignUp)}
+                                        type="submit"
+                                        className="w-100 fw-semibold py-2"
+                                        style={{
+                                            backgroundColor: "#a8ff60",
+                                            color: "#0a1930",
+                                            border: "none",
+                                            fontSize: "1rem",
+                                        }}
                                     >
-                                        {isSignUp ? "Log in" : "Sign up"}
+                                        {isSignUp ? "Sign Up" : "Log In"}
                                     </Button>
-                                </small>
-                            </div>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
+                                </Form>
+
+                                <div className="position-relative my-4">
+                                    <hr className="text-secondary" />
+                                    <span className="position-absolute top-50 start-50 translate-middle bg-transparent px-2 text-secondary">
+                                        or
+                                    </span>
+                                </div>
+
+                                <Button
+                                    variant="outline-light"
+                                    className="w-100 mb-3 fw-semibold py-2"
+                                    onClick={handleGoogleLogin}
+                                >
+                                    <i className="bi bi-google me-2"></i>
+                                    Continue with Google
+                                </Button>
+
+                                <div className="text-center mt-2">
+                                    <small className="text-secondary">
+                                        {isSignUp ? "Already have an account? " : "Don't have an account? "}
+                                        <Button
+                                            variant="link"
+                                            className="p-0 text-decoration-none fw-semibold"
+                                            style={{ color: "#a8ff60" }}
+                                            onClick={() => setIsSignUp(!isSignUp)}
+                                        >
+                                            {isSignUp ? "Log in" : "Sign up"}
+                                        </Button>
+                                    </small>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     );
 }

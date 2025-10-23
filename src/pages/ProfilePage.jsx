@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Navbar, Container, Button, Tabs, Tab } from "react-bootstrap";
+import { Nav, Navbar, Container, Button, Tabs, Tab } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import BookingForm from "../components/BookingForm";
 import { AuthContext } from "../components/AuthProvider";
@@ -64,47 +64,108 @@ export default function ProfilePage() {
     };
 
     return (
-        <>
-            <Navbar bg="light">
-                <Container>
-                    <Navbar.Collapse className="justify-content-end">
-                        <div className="container mt-2">
-                            <h5>Profile</h5>
-                            <p>Signed in as {auth.currentUser?.email}</p>
-                        </div>
-                        <Button
-                            variant="primary"
-                            className="btn btn-danger mt-3"
-                            onClick={handleLogout}>
-                            Logout
-                        </Button>
+        <div
+            style={{
+                minHeight: "100vh",
+                background: "linear-gradient(135deg, #0a1930 0%, #142850 100%)",
+                color: "#fff",
+            }}
+        >
+            <Navbar
+                expand="lg"
+                variant="dark"
+                style={{
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                    backdropFilter: "blur(10px)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}
+            >
+                <Container fluid className="px-4">
+                    <Navbar.Brand
+                        onClick={() => navigate("/")}
+                        style={{
+                            color: "#a8ff60",
+                            fontWeight: "700",
+                            textTransform: "uppercase",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Sportify<span className="text-light">Book</span>
+                    </Navbar.Brand>
+
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="ms-auto align-items-center">
+                            <span className="me-3 text-light small">
+                                Signed in as <strong>{auth.currentUser?.email}</strong>
+                            </span>
+                            <Button
+                                variant="light"
+                                size="sm"
+                                onClick={handleLogout}
+                                style={{
+                                    backgroundColor: "#a8ff60",
+                                    color: "#0a1930",
+                                    border: "none",
+                                    fontWeight: "600",
+                                }}
+                            >
+                                Logout
+                            </Button>
+                        </Nav>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
 
-            <Container className="mt-3">
-                <h2>Hello {currentUser?.displayName || "Guest"}, </h2>
+            <Container className="mt-4">
+                <h3 className="fw-bold mb-3">
+                    Welcome, {currentUser?.displayName || "Guest"}
+                </h3>
 
-                <Tabs defaultActiveKey="bookings" className="mt-3">
-                    <Tab eventKey="bookings" title="Book a Court">
-                        <MyBookings bookings={bookings} setBookings={setBookings} />
-                        <BookingForm onBookingSuccess={handleBookingSuccess} />
-                    </Tab>
-
-                    <Tab eventKey="matchmaking" title="Create a Match">
-                        <CreateMatch currentUser={currentUser} />
-                    </Tab>
-
-                    <Tab eventKey="open" title="Open Matches">
-                        <MatchRequestsList currentUser={currentUser} />
-                    </Tab>
-
-                    <Tab eventKey="myMatches" title="My Matches">
-                        <MyMatches currentUser={currentUser} />
-                    </Tab>
-                </Tabs>
+                <div
+                    className="p-3 rounded"
+                    style={{
+                        background: "rgba(255,255,255,0.05)",
+                        borderRadius: "1rem",
+                    }}
+                >
+                    <Tabs
+                        defaultActiveKey="bookings"
+                        className="mt-3 justify-content-center"
+                        fill
+                        variant="pills"
+                    >
+                        {[
+                            {
+                                key: "bookings", title: "Book a Court", content: (
+                                    <>
+                                        <MyBookings bookings={bookings} setBookings={setBookings} />
+                                        <BookingForm onBookingSuccess={handleBookingSuccess} />
+                                    </>
+                                )
+                            },
+                            { key: "matchmaking", title: "Create a Match", content: <CreateMatch currentUser={currentUser} /> },
+                            { key: "open", title: "Open Matches", content: <MatchRequestsList currentUser={currentUser} /> },
+                            { key: "myMatches", title: "My Matches", content: <MyMatches currentUser={currentUser} /> },
+                        ].map((tab) => (
+                            <Tab
+                                key={tab.key}
+                                eventKey={tab.key}
+                                title={tab.title}
+                                tabClassName="sporty-tab"
+                            >
+                                <div
+                                    className="p-3 rounded-3 mt-3"
+                                    style={{ background: "rgba(255,255,255,0.05)" }}
+                                >
+                                    {tab.content}
+                                </div>
+                            </Tab>
+                        ))}
+                    </Tabs>
+                </div>
             </Container>
-        </>
+        </div>
     );
 }
 

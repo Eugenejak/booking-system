@@ -16,7 +16,7 @@ export default function MatchRequestsList({ currentUser }) {
     const [matchRequests, setMatchRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-    const [filter, setFilter] = useState("all"); // "all", "Badminton", "Futsal"
+    const [filter, setFilter] = useState("all");
 
     useEffect(() => {
         if (!currentUser) return;
@@ -98,7 +98,7 @@ export default function MatchRequestsList({ currentUser }) {
             // Verify it's under 64 characters
             if (chatChannelId.length > 64) {
                 console.error("Channel ID too long:", chatChannelId.length);
-                // truncate if needed
+
                 const id1 = sortedIds[0].substring(0, 30);
                 const id2 = sortedIds[1].substring(0, 30);
                 chatChannelId = `${id1}_${id2}`;
@@ -125,7 +125,6 @@ export default function MatchRequestsList({ currentUser }) {
         }
     };
 
-    // Format date nicely
     const formatDate = (dateString) => {
         if (!dateString) return "Flexible";
         const date = new Date(dateString);
@@ -136,71 +135,64 @@ export default function MatchRequestsList({ currentUser }) {
         });
     };
 
-    // Format time like "19:00"
     const formatTime = (time) => {
         if (!time) return null;
         return time.slice(0, 5);
     };
 
     return (
-        <div className="container mt-4">
-            <h3>Find a Match</h3>
+        <div className="find-match-container">
+            <h3 className="section-title mb-4">Find a Match</h3>
 
-            {/* Filter Buttons */}
-            <div className="btn-group mb-3">
-                <button
-                    className={`btn ${filter === "all" ? "btn-primary" : "btn-outline-primary"}`}
-                    onClick={() => setFilter("all")}
-                >
-                    All Sports
-                </button>
-                <button
-                    className={`btn ${filter === "Badminton" ? "btn-primary" : "btn-outline-primary"}`}
-                    onClick={() => setFilter("Badminton")}
-                >
-                    Badminton
-                </button>
-                <button
-                    className={`btn ${filter === "Futsal" ? "btn-primary" : "btn-outline-primary"}`}
-                    onClick={() => setFilter("Futsal")}
-                >
-                    Futsal
-                </button>
+            <div className="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                {["all", "Badminton", "Futsal"].map((type) => (
+                    <button
+                        key={type}
+                        className={`btn ${filter === type ? "btn-filter-active" : "btn-filter"
+                            }`}
+                        onClick={() => setFilter(type)}
+                    >
+                        {type === "all" ? "All Sports" : type}
+                    </button>
+                ))}
             </div>
 
-            {/* Message Display */}
             {message && (
-                <div className={`alert ${message.includes("✅") ? "alert-success" : "alert-danger"}`}>
+                <div
+                    className={`alert ${message.includes("✅") ? "alert-success" : "alert-danger"
+                        } text-center fw-semibold`}
+                >
                     {message}
                 </div>
             )}
 
-            {/* Loading */}
             {loading ? (
-                <div className="text-center">
-                    <div className="spinner-border" role="status">
+                <div className="text-center py-5">
+                    <div className="spinner-border text-light" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
             ) : matchRequests.length === 0 ? (
-                <div className="alert alert-info">No open match requests now. Check back later!</div>
+                <div className="alert alert-info text-center no-match-alert">
+                    No open match requests now. Check back later!
+                </div>
             ) : (
-                <div className="row">
+                <div className="row g-4">
                     {matchRequests.map((request) => (
-                        <div key={request.id} className="col-md-6 col-lg-4 mb-3">
-                            <div className="card h-100">
+                        <div key={request.id} className="col-md-6 col-lg-4">
+                            <div className="card match-card h-100">
                                 <div className="card-body">
-                                    <h5 className="card-title">
-                                        {request.sport}{" "}
+                                    <h5 className="card-title text-accent">
+                                        {request.sport}
                                         <span className="badge bg-success ms-2">Open</span>
                                     </h5>
 
-                                    <p className="card-text">
+                                    <p className="card-text mb-1">
                                         <strong>Date:</strong> {formatDate(request.date)}
                                     </p>
 
                                     {request.start_time && (
-                                        <p className="card-text">
+                                        <p className="card-text mb-1">
                                             <strong>Time:</strong>{" "}
                                             {formatTime(request.start_time)} – {formatTime(request.end_time)}
                                         </p>
@@ -213,7 +205,7 @@ export default function MatchRequestsList({ currentUser }) {
                                     )}
 
                                     <button
-                                        className="btn btn-primary w-100"
+                                        className="btn btn-accept w-100 mt-3"
                                         onClick={() => handleAcceptMatch(request)}
                                     >
                                         Accept Match
