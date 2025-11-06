@@ -11,6 +11,8 @@ import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../components/AuthProvider";
 import { API_URL } from "../config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function AuthPage() {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -44,6 +46,13 @@ export default function AuthPage() {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
 
+                await setDoc(doc(db, "users", user.uid), {
+                    name: name,
+                    email: user.email,
+                    role: "user",
+                    createdAt: new Date(),
+                });
+
                 await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: {
@@ -72,6 +81,19 @@ export default function AuthPage() {
             if (user) {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
+
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    await setDoc(userDocRef, {
+                        name: user.displayName || "User",
+                        email: user.email,
+                        role: "user",
+                        createdAt: new Date(),
+                    });
+                }
+
                 await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: {
@@ -103,6 +125,18 @@ export default function AuthPage() {
             if (user) {
                 const token = await user.getIdToken();
                 localStorage.setItem("authToken", token);
+
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    await setDoc(userDocRef, {
+                        name: user.displayName || "Google User",
+                        email: user.email,
+                        role: "user",
+                        createdAt: new Date(),
+                    });
+                }
 
                 await fetch(`${API_URL}/users`, {
                     method: "POST",

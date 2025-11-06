@@ -10,6 +10,8 @@ export default function MyMatches({ currentUser }) {
     const [error, setError] = useState("");
     const [activeChat, setActiveChat] = useState({ client: null, channel: null });
     const [showChat, setShowChat] = useState(false);
+    const [userNames, setUserNames] = useState({});
+    const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
         if (!currentUser) return;
@@ -62,6 +64,36 @@ export default function MyMatches({ currentUser }) {
                 });
 
                 setMatches(matchesList);
+
+                const userIds = new Set();
+                matchesList.forEach(match => {
+                    if (match.creator_id !== currentUser.uid) userIds.add(match.creator_id);
+                    if (match.accepter_id !== currentUser.uid) userIds.add(match.accepter_id);
+                });
+
+                const names = {};
+                await Promise.all(
+                    Array.from(userIds).map(async (uid) => {
+                        try {
+                            // console.log(`Fetching user document for: ${uid}`);
+                            const userDoc = await getDoc(doc(db, "users", uid));
+                            // console.log(`User ${uid} exists:`, userDoc.exists());
+
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+                                //console.log(`User ${uid} full data:`, userData);
+                                // console.log(`Name for ${uid}:`, userData.name);
+                                names[uid] = userData.name || userData.displayName;
+                            } else {
+                                console.log(`No document found for user ${uid}`);
+                            }
+                        } catch (error) {
+                            console.error("Could not load user name for:", uid, error);
+                        }
+                    })
+                );
+                setUserNames(names);
+
             } catch (err) {
                 console.error("Error loading matches:", err);
                 setError("Failed to load your matches.");
@@ -71,7 +103,7 @@ export default function MyMatches({ currentUser }) {
         };
 
         fetchMyMatches();
-    }, [currentUser]);
+    }, [currentUser, refresh]);
 
     const handleCancelMatch = async (matchId) => {
         const confirmCancel = window.confirm("Are you sure you want to cancel this match?");
@@ -151,7 +183,16 @@ export default function MyMatches({ currentUser }) {
 
     return (
         <div className="my-matches-container container mt-4">
-            <h3 className="section-title mb-4">My Matches</h3>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h3 className="section-title mb-4">My Matches</h3>
+                <button
+                    className="btn btn-sm btn-outline-light"
+                    onClick={() => setRefresh(prev => prev + 1)}
+                    disabled={loading}
+                >
+                    {loading ? '🔄 Loading...' : '🔄 Refresh'}
+                </button>
+            </div>
 
             {matches.length === 0 ? (
                 <div className="alert alert-info text-center no-match-alert">
@@ -194,17 +235,17 @@ export default function MyMatches({ currentUser }) {
 
                                         <p className="card-text mb-1">
                                             <strong>Creator:</strong>{" "}
-                                            {match.creator_id === currentUser.uid ? "You" : match.creator_id}
+                                            {match.creator_id === currentUser.uid ? "You" : userNames[match.creator_id] || match.creator_id}
                                         </p>
                                         <p className="card-text">
                                             <strong>Opponent:</strong>{" "}
                                             {match.accepter_id === currentUser.uid
-                                                ? match.creator_id
-                                                : match.accepter_id}
+                                                ? userNames[match.creator_id] || match.creator_id
+                                                : userNames[match.accepter_id] || match.accepter_id}
                                         </p>
 
                                         <p className="card-text">
-                                            <small className="text-muted">
+                                            <small className="text-light opacity-75">
                                                 Created on{" "}
                                                 {match.created_at
                                                     ? new Date(match.created_at.seconds * 1000).toLocaleString()
