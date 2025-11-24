@@ -21,7 +21,7 @@ export default function ProfilePage() {
     // Check if currentUser is logged in
     useEffect(() => {
         if (!currentUser) {
-            navigate("/login"); // Redirect to login if user not logged in
+            navigate("/"); // Redirect to login if user not logged in
         }
     }, [currentUser, navigate]);
 
@@ -58,7 +58,7 @@ export default function ProfilePage() {
             console.log("✅ User signed out successfully");
 
             localStorage.removeItem("activeTab");
-            navigate("/login");
+            navigate("/");
         } catch (error) {
             console.error("❌ Error during logout:", error);
             alert("Failed to log out. Please try again.");

@@ -8,14 +8,18 @@ import {
 } from "firebase/auth";
 import { useContext, useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from "../components/AuthProvider";
 import { API_URL } from "../config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export default function AuthPage() {
-    const [isSignUp, setIsSignUp] = useState(false);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const mode = searchParams.get('mode');
+
+    const [isSignUp, setIsSignUp] = useState(mode === 'signup');
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
